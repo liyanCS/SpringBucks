@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Coffee/Coffee.iml" filepath="$PROJECT_DIR$/Coffee/Coffee.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/SpringBucks.iml" filepath="$PROJECT_DIR$/.idea/SpringBucks.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mongo-demo/mongo-demo.iml" filepath="$PROJECT_DIR$/mongo-demo/mongo-demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/mybatis-demo/mybatis-demo.iml" filepath="$PROJECT_DIR$/mybatis-demo/mybatis-demo.iml" />
     </modules>
   </component>

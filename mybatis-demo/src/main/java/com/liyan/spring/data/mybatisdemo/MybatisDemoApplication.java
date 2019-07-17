@@ -31,14 +31,24 @@ public class MybatisDemoApplication implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        Coffee coffee = Coffee.builder()
-                .name("espresso")
+        Coffee coffee1 = Coffee.builder()
+                .name("espresso1")
                 .price(Money.of(CurrencyUnit.of("CNY"), 20.0))
                 .build();
-        Long id = coffeeMapper.save(coffee);
-        log.info("Coffee {} => {}", id, coffee);
+        Long id1 = coffeeMapper.save(coffee1);
+        log.info("Coffee {} => {}", id1, coffee1);
+        log.info("coffee1.getId:{}", coffee1.getId());
 
-        coffee = coffeeMapper.findById(id);
+        Coffee coffee2 = Coffee.builder()
+                .name("espresso2")
+                .price(Money.of(CurrencyUnit.of("CNY"), 20.0))
+                .build();
+
+        Long id2 = coffeeMapper.save(coffee2);
+        log.info("Coffee {} => {}", id2, coffee2);
+        log.info("coffee2.getId:{}", coffee2.getId());
+
+        Coffee coffee = coffeeMapper.findById(id1);
         log.info("Coffee {}", coffee);
     }
 

@@ -7,11 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Coffee" />
+        <module name="mongo-demo" />
         <module name="mybatis-demo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Coffee" target="10" />
+      <module name="mongo-demo" target="10" />
       <module name="mybatis-demo" target="10" />
       <module name="SpringBucks" target="10" />
     </bytecodeTargetLevel>

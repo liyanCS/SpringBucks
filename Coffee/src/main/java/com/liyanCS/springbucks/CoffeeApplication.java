@@ -2,9 +2,11 @@ package com.liyanCS.springbucks;
 
 import com.liyanCS.springbucks.model.Coffee;
 import com.liyanCS.springbucks.model.CoffeeOrder;
-import com.liyanCS.springbucks.model.OrderStatus;
+import com.liyanCS.springbucks.model.OrderStates;
 import com.liyanCS.springbucks.repository.CoffeeOrderRepository;
 import com.liyanCS.springbucks.repository.CoffeeRepository;
+import com.liyanCS.springbucks.service.CoffeeOrderService;
+import com.liyanCS.springbucks.service.CoffeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -13,14 +15,10 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * @author Li Yan
@@ -36,6 +34,12 @@ public class CoffeeApplication implements ApplicationRunner {
     @Autowired
     private CoffeeOrderRepository coffeeOrderRepository;
 
+    @Autowired
+    private CoffeeService coffeeService;
+
+    @Autowired
+    private CoffeeOrderService coffeeOrderService;
+
     public static void main(String[] args) {
         SpringApplication.run(CoffeeApplication.class, args);
     }
@@ -49,9 +53,16 @@ public class CoffeeApplication implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-
         initOrders();
-        findOrders();
+
+        log.info("All Coffee: {}", coffeeRepository.findAll());
+
+        Optional<Coffee> latte = coffeeService.findOneCoffee("Latte");
+        if (latte.isPresent()) {
+            CoffeeOrder order = coffeeOrderService.createOrder("Li Lei", latte.get());
+            log.info("Update INIT to PAID: {}", coffeeOrderService.updateState(order, OrderStates.PAID));
+            log.info("Update PAID to INIT: {}", coffeeOrderService.updateState(order, OrderStates.INIT));
+        }
 
     }
 
@@ -70,46 +81,13 @@ public class CoffeeApplication implements ApplicationRunner {
         coffeeRepository.save(latte);
         log.info("Coffee:{}", latte);
 
-        CoffeeOrder order = CoffeeOrder.builder()
-                .customer("Li Lei")
-                .items(Collections.singletonList(espresso))
-                .state(OrderStatus.INIT)
+        Coffee mocha = Coffee.builder()
+                .name("mocha")
+                .price(Money.of(CurrencyUnit.of("CNY"), 35.0))
                 .build();
-        coffeeOrderRepository.save(order);
-        log.info("Order:{}", order);
+        coffeeRepository.save(mocha);
+        log.info("Coffee:{}", mocha);
 
-        order = CoffeeOrder.builder()
-                .customer("Li Lei")
-                .items(Arrays.asList(espresso, latte))
-                .state(OrderStatus.INIT)
-                .build();
-        coffeeOrderRepository.save(order);
-        log.info("Order:{}", order);
-    }
-
-    private void findOrders() {
-        coffeeRepository.findAll(Sort.by(Sort.Direction.DESC, "id"))
-                .forEach(c -> log.info("Loading {}", c));
-
-
-        List<CoffeeOrder> list = coffeeOrderRepository.findTop3ByOrderByUpdateTimeDescIdAsc();
-        log.info("findTop3ByOrderByUpdateTimeDescIdAsc: {}", getJoinedOrderId(list));
-
-        list = coffeeOrderRepository.findByCustomerOrderById("Li Lei");
-        log.info("findByCustomerOrderById: {}", list);
-
-        list.forEach(o -> {
-            log.info("order:{}", o.getId());
-            o.getItems().forEach(i -> log.info("Item: {}", i));
-        });
-
-        list = coffeeOrderRepository.findByItems_name("latte");
-        log.info("findByItems_name:{}", getJoinedOrderId(list));
-    }
-
-    private String getJoinedOrderId(List<CoffeeOrder> list) {
-        return list.stream().map(o -> o.getId().toString())
-                .collect(Collectors.joining(","));
     }
 
 }
